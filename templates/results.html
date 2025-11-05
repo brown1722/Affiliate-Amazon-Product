@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Results - Amazon Product Search</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        .header {
+            border-bottom: 2px solid #eee;
+            padding-bottom: 25px;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            color: #333;
+            margin: 0 0 15px 0;
+            font-size: 28px;
+        }
+        .search-form {
+            margin-top: 20px;
+        }
+        .search-input {
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            width: 300px;
+            margin-right: 10px;
+        }
+        .search-btn {
+            padding: 12px 25px;
+            background: #ff9900;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .search-btn:hover {
+            background: #e88700;
+        }
+        .search-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            color: #666;
+        }
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        .product-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 20px;
+            background: white;
+            transition: all 0.3s ease;
+            height: auto;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+        .product-card:hover {
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            transform: translateY(-2px);
+            border-color: #ff9900;
+        }
+        .product-image {
+            text-align: center;
+            margin-bottom: 15px;
+            height: 220px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fafafa;
+            border-radius: 8px;
+        }
+        .product-image img {
+            max-width: 100%;
+            max-height: 200px;
+            object-fit: contain;
+            border-radius: 6px;
+        }
+        .product-image-placeholder {
+            width: 100%;
+            height: 200px;
+            background: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            font-size: 14px;
+            border-radius: 6px;
+        }
+        .product-asin {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-family: monospace;
+        }
+        .product-brand {
+            font-size: 13px;
+            color: #0066cc;
+            margin-bottom: 8px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .product-title {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            line-height: 1.4;
+            color: #333;
+            flex-grow: 1;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            min-height: 63px;
+        }
+        .product-rating {
+            font-size: 13px;
+            color: #ff6b35;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+        .product-price-container {
+            margin-bottom: 12px;
+        }
+        .product-price {
+            font-size: 20px;
+            color: #B12704;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .product-original-price {
+            font-size: 14px;
+            color: #888;
+            text-decoration: line-through;
+            margin-bottom: 5px;
+        }
+        .price-savings {
+            font-size: 12px;
+            color: #008a00;
+            font-weight: 600;
+        }
+        .product-availability {
+            font-size: 13px;
+            color: #008a00;
+            margin-bottom: 15px;
+            font-weight: 600;
+            padding: 5px 10px;
+            background: rgba(0,138,0,0.1);
+            border-radius: 5px;
+            text-align: center;
+        }
+        .product-availability.out-of-stock {
+            color: #d93025;
+            background: rgba(217,48,37,0.1);
+        }
+        .product-link {
+            background: linear-gradient(135deg, #ff9900, #ffb84d);
+            color: white;
+            padding: 12px 20px;
+            text-decoration: none;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 14px;
+            margin-top: auto;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .product-link:hover {
+            background: linear-gradient(135deg, #e88700, #ff9900);
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(255,153,0,0.4);
+        }
+        .load-more-container {
+            text-align: center;
+            margin: 40px 0;
+        }
+        .load-more-btn {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .load-more-btn:hover {
+            background: linear-gradient(135deg, #218838, #1ea976);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(40,167,69,0.4);
+        }
+        .load-more-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 30px;
+            color: #666;
+        }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #ff9900;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .error-message {
+            background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+            border: 1px solid #f5c6cb;
+        }
+        .no-more-products {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            margin: 30px 0;
+            font-size: 16px;
+        }
+        .product-meta {
+            font-size: 12px;
+            color: #888;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #eee;
+        }
+        @media (max-width: 768px) {
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+                gap: 20px;
+            }
+            .search-input {
+                width: 250px;
+                margin-bottom: 10px;
+            }
+            .container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="search-info">
+                <h1>{% if keywords %}Search Results for "{{ keywords }}"{% else %}Amazon Product Search{% endif %}</h1>
+            </div>
+            
+            <!-- Search Form -->
+            <form method="POST" action="/search" class="search-form">
+                <input type="text" name="keywords" class="search-input" 
+                       placeholder="Search for products..." 
+                       value="{{ keywords or '' }}" required>
+                <button type="submit" class="search-btn">Search</button>
+            </form>
+        </div>
+
+        <!-- Error Message -->
+        {% if error %}
+        <div class="error-message">{{ error }}</div>
+        {% endif %}
+
+        <!-- Products Grid -->
+        {% if products %}
+        <div class="products-grid" id="products-container">
+            {% for product in products %}
+            <div class="product-card">
+                <!-- ASIN Display -->
+                {% if product.asin %}
+                <div class="product-asin">{{ product.asin }}</div>
+                {% endif %}
+                
+                <!-- Product Image -->
+                <div class="product-image">
+                    {% if product.imageUrl %}
+                        <img src="{{ product.imageUrl }}" alt="{{ product.title }}" loading="lazy">
+                    {% else %}
+                        <div class="product-image-placeholder">
+                            No Image Available
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Brand -->
+                {% if product.brand %}
+                <div class="product-brand">{{ product.brand }}</div>
+                {% endif %}
+                
+                <!-- Product Title -->
+                <div class="product-title">{{ product.title }}</div>
+                
+                <!-- Rating and Reviews -->
+                {% if product.rating %}
+                <div class="product-rating">★ {{ product.rating }}</div>
+                {% endif %}
+                
+                <!-- Price Container -->
+                <div class="product-price-container">
+                    {% if product.originalPrice %}
+                    <div class="product-original-price">{{ product.originalPrice }}</div>
+                    {% endif %}
+                    
+                    <div class="product-price">{{ product.price }}</div>
+                    
+                    {% if product.originalPrice and product.price != 'Price not available' %}
+                    <div class="price-savings">You Save!</div>
+                    {% endif %}
+                </div>
+                
+                <!-- Availability -->
+                {% if product.availability %}
+                <div class="product-availability {% if 'out of stock' in product.availability.lower() or 'unavailable' in product.availability.lower() %}out-of-stock{% endif %}">
+                    {{ product.availability }}
+                </div>
+                {% endif %}
+                
+                <!-- Product Link -->
+                <a href="{{ product.detailPageUrl or product.link }}" target="_blank" class="product-link">
+                    View on Amazon
+                </a>
+                
+                <!-- Product Metadata -->
+                <div class="product-meta">
+                    {% if product.asin %}ASIN: {{ product.asin }}{% endif %}
+                    {% if product.reviewCount %} • {{ product.reviewCount }}{% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div style="text-align: center; padding: 40px; color: #666;">
+            {% if keywords %}
+            <p>No products found for "{{ keywords }}". Try a different search term.</p>
+            {% else %}
+            <p>Enter a search term above to find products.</p>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- Load More Button -->
+        {% if products and products|length > 0 %}
+        <div class="load-more-container">
+            <button id="load-more-btn" class="load-more-btn" onclick="loadMoreProducts()">
+                Load More Products
+            </button>
+        </div>
+        {% endif %}
+
+        <!-- Loading Indicator -->
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p>Loading more products...</p>
+        </div>
+
+        <!-- Error Message Container -->
+        <div id="error-message" class="error-message" style="display: none;"></div>
+        
+        <!-- No More Products Message -->
+        <div id="no-more-message" class="no-more-products" style="display: none;">
+            No more products available
+        </div>
+    </div>
+
+    <script>
+        let currentPage = {{ current_page or 1 }};
+        let keywords = "{{ keywords or '' }}";
+        let isLoading = false;
+
+        function loadMoreProducts() {
+            if (isLoading || !keywords) return;
+            
+            isLoading = true;
+            document.getElementById('load-more-btn').disabled = true;
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('error-message').style.display = 'none';
+
+            fetch('/load_more', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    keywords: keywords,
+                    page: currentPage
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+
+                if (data.products && data.products.length > 0) {
+                    appendProducts(data.products);
+                    currentPage = data.page;
+                    
+                    // Hide load more button if no more products
+                    if (!data.has_more || data.products.length < 10) {
+                        document.getElementById('load-more-btn').style.display = 'none';
+                        document.getElementById('no-more-message').style.display = 'block';
+                    }
+                } else {
+                    document.getElementById('load-more-btn').style.display = 'none';
+                    document.getElementById('no-more-message').style.display = 'block';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('error-message').textContent = 'Error loading more products: ' + error.message;
+                document.getElementById('error-message').style.display = 'block';
+            })
+            .finally(() => {
+                isLoading = false;
+                document.getElementById('load-more-btn').disabled = false;
+                document.getElementById('loading').style.display = 'none';
+            });
+        }
+
+        function appendProducts(products) {
+            const container = document.getElementById('products-container');
+            
+            products.forEach(product => {
+                const productCard = createProductCard(product);
+                container.appendChild(productCard);
+            });
+        }
+
+        function createProductCard(product) {
+            const card = document.createElement('div');
+            card.className = 'product-card';
+            
+            const imageUrl = product.imageUrl || '';
+            const productLink = product.detailPageUrl || product.link || '';
+            
+            const imageHtml = imageUrl 
+                ? `<img src="${imageUrl}" alt="${escapeHtml(product.title)}" loading="lazy">`
+                : `<div class="product-image-placeholder">No Image Available</div>`;
+            
+            const asinHtml = product.asin ? `<div class="product-asin">${escapeHtml(product.asin)}</div>` : '';
+            const brandHtml = product.brand ? `<div class="product-brand">${escapeHtml(product.brand)}</div>` : '';
+            const ratingHtml = product.rating ? `<div class="product-rating">★ ${escapeHtml(product.rating)}</div>` : '';
+            const originalPriceHtml = product.originalPrice ? `<div class="product-original-price">${escapeHtml(product.originalPrice)}</div>` : '';
+            const savingsHtml = (product.originalPrice && product.price !== 'Price not available') ? '<div class="price-savings">You Save!</div>' : '';
+            
+            const availabilityClass = (product.availability && (product.availability.toLowerCase().includes('out of stock') || product.availability.toLowerCase().includes('unavailable'))) ? 'out-of-stock' : '';
+            const availabilityHtml = product.availability ? `<div class="product-availability ${availabilityClass}">${escapeHtml(product.availability)}</div>` : '';
+            
+            const metaHtml = `
+                <div class="product-meta">
+                    ${product.asin ? `ASIN: ${escapeHtml(product.asin)}` : ''}
+                    ${product.reviewCount ? ` • ${escapeHtml(product.reviewCount)}` : ''}
+                </div>
+            `;
+            
+            card.innerHTML = `
+                ${asinHtml}
+                <div class="product-image">
+                    ${imageHtml}
+                </div>
+                ${brandHtml}
+                <div class="product-title">${escapeHtml(product.title)}</div>
+                ${ratingHtml}
+                <div class="product-price-container">
+                    ${originalPriceHtml}
+                    <div class="product-price">${escapeHtml(product.price)}</div>
+                    ${savingsHtml}
+                </div>
+                ${availabilityHtml}
+                <a href="${escapeHtml(productLink)}" target="_blank" class="product-link">
+                    View on Amazon
+                </a>
+                ${metaHtml}
+            `;
+            
+            return card;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text || '';
+            return div.innerHTML;
+        }
+
+        // Auto-redirect for search
+        {% if redirect_search %}
+        window.location.href = '/?q=' + encodeURIComponent('{{ keywords }}');
+        {% endif %}
+    </script>
+</body>
+</html>

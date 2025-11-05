@@ -1,0 +1,17 @@
+# .git
+# .gitignore
+# README.md
+# .env
+# *.pyc
+# __pycache__/
+# .pytest_cache/
+# .coverage
+# .DS_Store
+# *.log
+# node_modules/
+# .vscode/
+# .idea/
+# *.swp
+# *.swo
+# *~
+# venv/
